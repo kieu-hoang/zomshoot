@@ -20,7 +20,6 @@ class Crosshair(pygame.sprite.Sprite):
         self.rect.center = pygame.mouse.get_pos()
         
     def shoot(self):
-        # self.gunshot.play()
         pygame.mixer.Channel(1).play(self.gunshot)
         return pygame.sprite.spritecollide(crosshair, target_group, True)
 
@@ -120,6 +119,7 @@ class Target(pygame.sprite.Sprite):
     def killed(self):
         if self.missed == True:
             self.kill()
+            score.increase_miss()
                 
     def animate(self):
         self.is_animating = True
@@ -127,16 +127,18 @@ class Target(pygame.sprite.Sprite):
 class Score:
     def __init__(self):
         self.points = 0
-        self.miss_points = POINT1 + POINT2
+        self.miss_points = 0
         self.font = pygame.font.SysFont('monospace', 30, bold=False)
     
     def increase(self):
         self.points += 1
-        self.miss_points -= 1
+    
+    def increase_miss(self):
+        self.miss_points += 1
     
     def reset(self):
         self.points = 0
-        self.miss_points = POINT1 + POINT2
+        self.miss_points = 0
     
     def show(self, surface):
         lbl = self.font.render('Score: ' + str(self.points) + '  Miss: ' + str(self.miss_points), 1, WHITE)    
@@ -184,7 +186,8 @@ class GameState():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 shot = crosshair.shoot()
                 if shot:
-                    score.increase()     
+                    for i in shot:
+                        score.increase()     
         pygame.display.flip()
         screen.blit(background, (0,0))
         target_group.draw(screen)
@@ -222,7 +225,8 @@ class GameState():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 shot = crosshair.shoot()
                 if shot:
-                    score.increase()
+                    for i in shot:
+                        score.increase()
             
         pygame.display.flip()
         screen.blit(background, (0,0))
